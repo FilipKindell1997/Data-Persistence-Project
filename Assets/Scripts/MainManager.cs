@@ -18,10 +18,33 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
+    public Text ScoreTextWithName;
+    private string playerName;
+    private string bestPlayerName;
+    private int bestScore;
     
     // Start is called before the first frame update
     void Start()
     {
+
+        // Set player name & get best score with name
+        playerName = MenuManager.instance.GetPlayerName();
+        bestPlayerName = MenuManager.instance.GetBestPlayerName();
+        bestScore = MenuManager.instance.GetBestScore();
+
+        // Set ScoreTextWithName values
+        if (bestScore <= 0)
+        {
+            ScoreTextWithName.text = "Best Score : " + playerName + " : 0";
+        }
+        else
+        {
+
+            ScoreTextWithName.text = "Best Score : " + bestPlayerName + " : " + bestScore;
+
+        }
+
+        // other stuff
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -66,11 +89,37 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+
+        //Change bestScore & bestPlayerName
+        if (m_Points > bestScore)
+        {
+
+            bestScore = m_Points;
+
+            if (bestPlayerName != playerName)
+            {
+
+                bestPlayerName = playerName;
+
+            }
+
+            ScoreTextWithName.text = "Best Score : " + bestPlayerName + " : " + bestScore;
+
+        }
+
     }
 
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        if (bestScore != MenuManager.instance.GetBestScore()) {
+            MenuManager.instance.SetBestScore(bestScore);
+            MenuManager.instance.SetBestPlayerName(bestPlayerName);
+        }
+
+        MenuManager.instance.SaveBestScoreAndName();
+
     }
 }
